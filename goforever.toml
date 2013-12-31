@@ -1,0 +1,21 @@
+username = "go"
+password = "forever"
+
+
+[[process]]
+name = "example-panic"
+command = "./example/example-panic"
+pidfile = "example/example-panic.pid"
+logfile = "example/logs/example-panic.debug.log"
+errfile = "example/logs/example-panic.errors.log"
+respawn = 1
+ping = "30s"
+
+[[process]]
+name = "example"
+command = "./example/example"
+pidfile = "example/example.pid"
+logfile = "example/logs/example.debug.log"
+errfile = "example/logs/example.errors.log"
+respawn = 1
+
