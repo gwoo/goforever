@@ -37,16 +37,16 @@ func TestProcessStart(t *testing.T) {
 	c := &Config{
 		"", "",
 		[]*Process{&Process{
-			Name:    "example",
-			Command: "example/example",
-			Pidfile: "example/example.pid",
-			Logfile: "example/logs/example.debug.log",
-			Errfile: "example/logs/example.errors.log",
+			Name:    "bash",
+			Command: "/bin/bash",
+			Pidfile: "echo.pid",
+			Logfile: "debug.log",
+			Errfile: "error.log",
 			Respawn: 3,
 		}},
 	}
-	p := c.Get("example")
-	p.start("example")
+	p := c.Get("bash")
+	p.start("bash")
 	ex := 0
 	r := p.x.Pid
 	if ex >= r {
