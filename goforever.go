@@ -68,24 +68,28 @@ func main() {
 }
 
 func Cli() string {
+	var o []byte
+	var err error
 	sub := flag.Arg(0)
 	name := flag.Arg(1)
-	var o []byte
 
 	if sub == "list" {
-		o, _ = greq.Get("/")
+		o, _, err = greq.Get("/")
 	}
 	if name != "" {
 		switch sub {
 		case "show":
-			o, _ = greq.Get("/" + name)
+			o, _, err = greq.Get("/" + name)
 		case "start":
-			o, _ = greq.Post("/"+name, nil)
+			o, _, err = greq.Post("/"+name, nil)
 		case "stop":
-			o, _ = greq.Delete("/" + name)
+			o, _, err = greq.Delete("/" + name)
 		case "restart":
-			o, _ = greq.Put("/"+name, nil)
+			o, _, err = greq.Put("/"+name, nil)
 		}
+	}
+	if err != nil {
+		fmt.Printf("Process error: %s", err)
 	}
 	return string(o)
 }

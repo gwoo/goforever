@@ -55,5 +55,6 @@ func newTestResponse(method string, path string, body io.Reader) ([]byte, *http.
 	ts := httptest.NewServer(http.HandlerFunc(Handler))
 	defer ts.Close()
 	url := ts.URL + path
-	return greq.Request(method, url, body)
+	b, r, _ := greq.Request(method, url, body)
+	return b, r
 }
