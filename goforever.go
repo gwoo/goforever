@@ -17,7 +17,6 @@ var conf = flag.String("conf", "goforever.toml", "Path to config file.")
 var port = flag.Int("port", 8080, "Port for the server.")
 var username = flag.String("username", "demo", "Username for basic auth.")
 var password = flag.String("password", "test", "Password for basic auth.")
-var server string
 var config *Config
 
 var Usage = func() {

@@ -44,6 +44,7 @@ type Process struct {
 	Errfile  string
 	Path     string
 	Respawn  int
+	Delay    string
 	Ping     string
 	Pid      int
 	Status   string
@@ -92,6 +93,9 @@ func (p *Process) start(name string) {
 			NewLog(p.Logfile),
 			NewLog(p.Errfile),
 		},
+	}
+	if p.Args == nil {
+		p.Args = []string{}
 	}
 	process, err := os.StartProcess(p.Command, p.Args, proc)
 	if err != nil {
@@ -190,6 +194,10 @@ func (p *Process) watch() {
 			return
 		}
 		fmt.Fprintf(os.Stderr, "%s respawns = %#v\n", p.Name, p.respawns)
+		if p.Delay != "" {
+			t, _ := time.ParseDuration(p.Delay)
+			time.Sleep(t)
+		}
 		p.restart()
 		p.Status = "restarted"
 	case err := <-died:

@@ -30,7 +30,7 @@ func TestShowHandler(t *testing.T) {
 		"test": &Process{Name: "test"},
 	}
 	body, _ := newTestResponse("GET", "/test", nil)
-	e := []byte(`{"Name":"test","Command":"","Args":null,"Pidfile":"","Logfile":"","Errfile":"","Path":"","Respawn":0,"Ping":"","Pid":0,"Status":""}`)
+	e := []byte(`{"Name":"test","Command":"","Args":null,"Pidfile":"","Logfile":"","Errfile":"","Path":"","Respawn":0,"Delay":"","Ping":"","Pid":0,"Status":""}`)
 	ex := fmt.Sprintf("%s", e)
 	r := fmt.Sprintf("%s", body)
 	if ex != r {
@@ -43,7 +43,7 @@ func TestPostHandler(t *testing.T) {
 		"test": &Process{Name: "test", Command: "/bin/echo", Args: []string{"woohoo"}},
 	}
 	body, _ := newTestResponse("POST", "/test", nil)
-	e := []byte(`{"Name":"test","Command":"/bin/echo","Args":["woohoo"],"Pidfile":"","Logfile":"","Errfile":"","Path":"","Respawn":0,"Ping":"","Pid":0,"Status":"stopped"}`)
+	e := []byte(`{"Name":"test","Command":"/bin/echo","Args":["woohoo"],"Pidfile":"","Logfile":"","Errfile":"","Path":"","Respawn":0,"Delay":"","Ping":"","Pid":0,"Status":"stopped"}`)
 	ex := fmt.Sprintf("%s", e)
 	r := fmt.Sprintf("%s", body)
 	if ex != r {
