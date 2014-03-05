@@ -1,6 +1,9 @@
+port = "2224"
 username = "go"
 password = "forever"
-
+pidfile = "goforever.pid"
+logfile = "goforever.log"
+errfile = "goforever.log"
 
 [[process]]
 name = "example-panic"
@@ -15,6 +18,7 @@ ping = "30s"
 [[process]]
 name = "example"
 command = "./example/example"
+args = ["-name=foo"]
 pidfile = "example/example.pid"
 logfile = "example/logs/example.debug.log"
 errfile = "example/logs/example.errors.log"

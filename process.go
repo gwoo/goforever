@@ -94,10 +94,8 @@ func (p *Process) start(name string) {
 			NewLog(p.Errfile),
 		},
 	}
-	if p.Args == nil {
-		p.Args = []string{}
-	}
-	process, err := os.StartProcess(p.Command, p.Args, proc)
+	args := append([]string{p.Name}, p.Args...)
+	process, err := os.StartProcess(p.Command, args, proc)
 	if err != nil {
 		log.Fatalf("%s failed. %s", p.Name, err)
 		return

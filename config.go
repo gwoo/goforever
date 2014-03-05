@@ -11,8 +11,13 @@ import (
 )
 
 type Config struct {
+	Port      string
 	Username  string
 	Password  string
+	Daemonize bool
+	Pidfile   Pidfile
+	Logfile   string
+	Errfile   string
 	Processes []*Process `toml:"process"`
 }
 

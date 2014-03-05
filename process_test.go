@@ -8,11 +8,10 @@ import (
 )
 
 func TestPidfile(t *testing.T) {
-	c := &Config{"", "",
-		[]*Process{&Process{
-			Name:    "test",
-			Pidfile: "test.pid",
-		}},
+	c := &Config{Processes: []*Process{&Process{
+		Name:    "test",
+		Pidfile: "test.pid",
+	}},
 	}
 	p := c.Get("test")
 	err := p.Pidfile.write(100)
@@ -34,16 +33,15 @@ func TestPidfile(t *testing.T) {
 }
 
 func TestProcessStart(t *testing.T) {
-	c := &Config{
-		"", "",
-		[]*Process{&Process{
-			Name:    "bash",
-			Command: "/bin/bash",
-			Pidfile: "echo.pid",
-			Logfile: "debug.log",
-			Errfile: "error.log",
-			Respawn: 3,
-		}},
+	c := &Config{Processes: []*Process{&Process{
+		Name:    "bash",
+		Command: "/bin/bash",
+		Args:    []string{"foo", "bar"},
+		Pidfile: "echo.pid",
+		Logfile: "debug.log",
+		Errfile: "error.log",
+		Respawn: 3,
+	}},
 	}
 	p := c.Get("bash")
 	p.start("bash")

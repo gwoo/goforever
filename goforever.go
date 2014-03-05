@@ -14,43 +14,41 @@ import (
 
 var d = flag.Bool("d", false, "Daemonize goforever. Must be first flag")
 var conf = flag.String("conf", "goforever.toml", "Path to config file.")
-var port = flag.Int("port", 8080, "Port for the server.")
-var username = flag.String("username", "demo", "Username for basic auth.")
-var password = flag.String("password", "test", "Password for basic auth.")
 var config *Config
+var daemon *Process
 
 var Usage = func() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 	flag.PrintDefaults()
 	usage := `
 Process subcommands
-  list			List processes.
+  list			    List processes.
   show <process>	Show a process.
   start <process>	Start a process.
   stop <process>	Stop a process.
   restart <process>	Restart a process.
+  end               Stop goforever and all processes
 `
 	fmt.Fprintln(os.Stderr, usage)
 }
 
 func init() {
+	flag.Parse()
 	setConfig()
 	setHost()
 	daemon = &Process{
 		Name:    "goforever",
-		Args:    []string{"./goforever"},
+		Args:    []string{},
 		Command: "goforever",
-		Pidfile: "goforever.pid",
-		Logfile: "goforever.debug.log",
-		Errfile: "goforever.errors.log",
+		Pidfile: config.Pidfile,
+		Logfile: config.Logfile,
+		Errfile: config.Errfile,
 		Respawn: 1,
 	}
 	flag.Usage = Usage
 }
 
 func main() {
-	flag.Parse()
-	daemon.Name = "goforever"
 	if *d == true {
 		daemon.Args = append(daemon.Args, os.Args[2:]...)
 		daemon.start(daemon.Name)
@@ -95,7 +93,6 @@ func Cli() string {
 }
 
 func RunDaemon() {
-	fmt.Printf("Running %s.\n", daemon.Name)
 	daemon.children = make(map[string]*Process, 0)
 	for _, name := range config.Keys() {
 		daemon.children[name] = config.Get(name)
@@ -104,18 +101,22 @@ func RunDaemon() {
 }
 
 func setConfig() {
-	c, err := LoadConfig(*conf)
+	var err error
+	config, err = LoadConfig(*conf)
 	if err != nil {
-		log.Fatalf("Config error: %s", err)
+		log.Fatalf("%s", err)
 		return
 	}
-	config = c
-
-	if config.Username != "" {
-		username = &config.Username
+	if config.Username == "" {
+		log.Fatalf("Config error: %s", "Please provide a username.")
+		return
 	}
-	if config.Password != "" {
-		password = &config.Password
+	if config.Password == "" {
+		log.Fatalf("Config error: %s", "Please provide a password.")
+		return
+	}
+	if config.Port == "" {
+		config.Port = "2224"
 	}
 }
 
@@ -124,5 +125,7 @@ func setHost() {
 	if isHttps() == false {
 		scheme = "http"
 	}
-	greq.Host = fmt.Sprintf("%s://%s:%s@0.0:%d", scheme, *username, *password, *port)
+	greq.Host = fmt.Sprintf("%s://%s:%s@0.0:%s",
+		scheme, config.Username, config.Password, config.Port,
+	)
 }

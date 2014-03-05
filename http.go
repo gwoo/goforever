@@ -13,19 +13,16 @@ import (
 	"strings"
 )
 
-var daemon *Process
-
 func HttpServer() {
 	http.HandleFunc("/favicon.ico", http.NotFound)
 	http.HandleFunc("/", AuthHandler(Handler))
-	fmt.Printf("goforever serving port %d\n", *port)
-
+	fmt.Printf("goforever serving port %s\n", config.Port)
 	if isHttps() == false {
-		http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
+		http.ListenAndServe(fmt.Sprintf(":%s", config.Port), nil)
 		return
 	}
 	log.Printf("SSL enabled.\n")
-	http.ListenAndServeTLS(fmt.Sprintf(":%d", *port), "cert.pem", "key.pem", nil)
+	http.ListenAndServeTLS(fmt.Sprintf(":%s", config.Port), "cert.pem", "key.pem", nil)
 }
 
 func isHttps() bool {
@@ -143,7 +140,7 @@ func AuthHandler(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if parts[0] == *username && parts[1] == *password {
+		if parts[0] == config.Username && parts[1] == config.Password {
 			fn(w, r)
 			return
 		}
