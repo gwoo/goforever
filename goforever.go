@@ -35,7 +35,6 @@ Process subcommands
 func init() {
 	flag.Parse()
 	setConfig()
-	setHost()
 	daemon = &Process{
 		Name:    "goforever",
 		Args:    []string{},
@@ -70,20 +69,20 @@ func Cli() string {
 	var err error
 	sub := flag.Arg(0)
 	name := flag.Arg(1)
-
+	req := greq.New(host(), true)
 	if sub == "list" {
-		o, _, err = greq.Get("/")
+		o, _, err = req.Get("/")
 	}
 	if name != "" {
 		switch sub {
 		case "show":
-			o, _, err = greq.Get("/" + name)
+			o, _, err = req.Get("/" + name)
 		case "start":
-			o, _, err = greq.Post("/"+name, nil)
+			o, _, err = req.Post("/"+name, nil)
 		case "stop":
-			o, _, err = greq.Delete("/" + name)
+			o, _, err = req.Delete("/" + name)
 		case "restart":
-			o, _, err = greq.Put("/"+name, nil)
+			o, _, err = req.Put("/"+name, nil)
 		}
 	}
 	if err != nil {
@@ -120,12 +119,12 @@ func setConfig() {
 	}
 }
 
-func setHost() {
+func host() string {
 	scheme := "https"
 	if isHttps() == false {
 		scheme = "http"
 	}
-	greq.Host = fmt.Sprintf("%s://%s:%s@0.0:%s",
+	return fmt.Sprintf("%s://%s:%s@0.0:%s",
 		scheme, config.Username, config.Password, config.Port,
 	)
 }
