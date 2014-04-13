@@ -50,11 +50,11 @@ func init() {
 func main() {
 	if *d == true {
 		daemon.Args = append(daemon.Args, os.Args[2:]...)
-		daemon.start(daemon.Name)
+		fmt.Printf(daemon.start(daemon.Name))
 		return
 	}
 	if len(flag.Args()) > 0 {
-		fmt.Printf("%s\n", Cli())
+		fmt.Printf("%s", Cli())
 		return
 	}
 	if len(flag.Args()) == 0 {
@@ -73,22 +73,45 @@ func Cli() string {
 	if sub == "list" {
 		o, _, err = req.Get("/")
 	}
+	if name == "" {
+		if sub == "start" {
+			daemon.Args = append(daemon.Args, os.Args[2:]...)
+			return daemon.start(daemon.Name)
+		}
+		_, _, err = daemon.find()
+		if err != nil {
+			return fmt.Sprintf("Error: %s.\n", err)
+		}
+		if sub == "show" {
+			return fmt.Sprintf("%s.\n", daemon.String())
+		}
+		if sub == "stop" {
+			message := daemon.stop()
+			return message
+		}
+		if sub == "restart" {
+			ch, message := daemon.restart()
+			fmt.Print(message)
+			return fmt.Sprintf("%s\n", <-ch)
+		}
+	}
 	if name != "" {
+		path := fmt.Sprintf("/%s", name)
 		switch sub {
 		case "show":
-			o, _, err = req.Get("/" + name)
+			o, _, err = req.Get(path)
 		case "start":
-			o, _, err = req.Post("/"+name, nil)
+			o, _, err = req.Post(path, nil)
 		case "stop":
-			o, _, err = req.Delete("/" + name)
+			o, _, err = req.Delete(path)
 		case "restart":
-			o, _, err = req.Put("/"+name, nil)
+			o, _, err = req.Put(path, nil)
 		}
 	}
 	if err != nil {
 		fmt.Printf("Process error: %s", err)
 	}
-	return string(o)
+	return fmt.Sprintf("%s\n", o)
 }
 
 func RunDaemon() {

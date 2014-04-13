@@ -63,26 +63,27 @@ func (p *Process) String() string {
 }
 
 //Find a process by name
-func (p *Process) find() (*os.Process, error) {
+func (p *Process) find() (*os.Process, string, error) {
 	if p.Pidfile == "" {
-		return nil, errors.New("Pidfile is empty.")
+		return nil, "", errors.New("Pidfile is empty.")
 	}
 	if pid := p.Pidfile.read(); pid > 0 {
 		process, err := os.FindProcess(pid)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		p.x = process
 		p.Pid = process.Pid
-		fmt.Printf("%s is %#v\n", p.Name, process.Pid)
 		p.Status = "running"
-		return process, nil
+		message := fmt.Sprintf("%s is %#v\n", p.Name, process.Pid)
+		return process, message, nil
 	}
-	return nil, errors.New(fmt.Sprintf("Could not find process %s.", p.Name))
+	message := fmt.Sprintf("%s not running.\n", p.Name)
+	return nil, message, errors.New(fmt.Sprintf("Could not find process %s.", p.Name))
 }
 
 //Start the process
-func (p *Process) start(name string) {
+func (p *Process) start(name string) string {
 	p.Name = name
 	wd, _ := os.Getwd()
 	proc := &os.ProcAttr{
@@ -97,22 +98,22 @@ func (p *Process) start(name string) {
 	args := append([]string{p.Name}, p.Args...)
 	process, err := os.StartProcess(p.Command, args, proc)
 	if err != nil {
-		log.Fatalf("%s failed. %s", p.Name, err)
-		return
+		log.Fatalf("%s failed. %s\n", p.Name, err)
+		return ""
 	}
 	err = p.Pidfile.write(process.Pid)
 	if err != nil {
-		log.Printf("%s pidfile error: %s", p.Name, err)
-		return
+		log.Printf("%s pidfile error: %s\n", p.Name, err)
+		return ""
 	}
 	p.x = process
 	p.Pid = process.Pid
-	fmt.Printf("%s is %#v\n", p.Name, process.Pid)
 	p.Status = "started"
+	return fmt.Sprintf("%s is %#v\n", p.Name, process.Pid)
 }
 
 //Stop the process
-func (p *Process) stop() {
+func (p *Process) stop() string {
 	if p.x != nil {
 		// p.x.Kill() this seems to cause trouble
 		cmd := exec.Command("kill", fmt.Sprintf("%d", p.x.Pid))
@@ -123,8 +124,8 @@ func (p *Process) stop() {
 		p.children.stop("all")
 	}
 	p.release("stopped")
-	fmt.Printf("%s stopped.\n", p.Name)
-
+	message := fmt.Sprintf("%s stopped.\n", p.Name)
+	return message
 }
 
 //Release process and remove pidfile
@@ -138,10 +139,11 @@ func (p *Process) release(status string) {
 }
 
 //Restart the process
-func (p *Process) restart() chan *Process {
+func (p *Process) restart() (chan *Process, string) {
 	p.stop()
-	fmt.Fprintf(os.Stderr, "%s restarted.\n", p.Name)
-	return RunProcess(p.Name, p)
+	message := fmt.Sprintf("%s restarted.\n", p.Name)
+	ch := RunProcess(p.Name, p)
+	return ch, message
 }
 
 //Run callback on the process after given duration.

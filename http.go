@@ -75,7 +75,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s does not exist.", name)
 		return
 	}
-	cp, _ := p.find()
+	cp, _, _ := p.find()
 	if cp != nil {
 		fmt.Fprintf(w, "%s already running.", name)
 		return
@@ -92,7 +92,7 @@ func PutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p.find()
-	ch := p.restart()
+	ch, _ := p.restart()
 	fmt.Fprintf(w, "%s", <-ch)
 }
 
