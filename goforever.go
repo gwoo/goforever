@@ -12,7 +12,6 @@ import (
 	"github.com/gwoo/greq"
 )
 
-var d = flag.Bool("d", false, "Daemonize goforever. Must be first flag")
 var conf = flag.String("conf", "goforever.toml", "Path to config file.")
 var config *Config
 var daemon *Process
@@ -21,18 +20,18 @@ var Usage = func() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 	flag.PrintDefaults()
 	usage := `
-Process subcommands
-  list			    List processes.
-  show <process>	Show a process.
-  start <process>	Start a process.
-  stop <process>	Stop a process.
-  restart <process>	Restart a process.
-  end               Stop goforever and all processes
+Commands
+  list              List processes.
+  show [name]       Show main proccess or named process.
+  start [name]      Start main proccess or named process.
+  stop [name]       Stop main proccess or named process.
+  restart [name]    Restart main proccess or named process.
 `
 	fmt.Fprintln(os.Stderr, usage)
 }
 
 func init() {
+	flag.Usage = Usage
 	flag.Parse()
 	setConfig()
 	daemon = &Process{
@@ -44,15 +43,9 @@ func init() {
 		Errfile: config.Errfile,
 		Respawn: 1,
 	}
-	flag.Usage = Usage
 }
 
 func main() {
-	if *d == true {
-		daemon.Args = append(daemon.Args, os.Args[2:]...)
-		fmt.Printf(daemon.start(daemon.Name))
-		return
-	}
 	if len(flag.Args()) > 0 {
 		fmt.Printf("%s", Cli())
 		return
