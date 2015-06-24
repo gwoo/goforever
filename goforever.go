@@ -140,7 +140,7 @@ func host() string {
 	if isHttps() == false {
 		scheme = "http"
 	}
-	return fmt.Sprintf("%s://%s:%s@0.0:%s",
+	return fmt.Sprintf("%s://%s:%s@0.0.0.0:%s",
 		scheme, config.Username, config.Password, config.Port,
 	)
 }
