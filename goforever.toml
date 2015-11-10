@@ -1,3 +1,4 @@
+ip = "127.0.0.1"
 port = "2224"
 username = "go"
 password = "forever"
