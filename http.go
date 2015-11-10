@@ -18,11 +18,11 @@ func HttpServer() {
 	http.HandleFunc("/", AuthHandler(Handler))
 	fmt.Printf("goforever serving port %s\n", config.Port)
 	if isHttps() == false {
-		http.ListenAndServe(fmt.Sprintf(":%s", config.Port), nil)
+		http.ListenAndServe(fmt.Sprintf("%s:%s", config.IP, config.Port), nil)
 		return
 	}
 	log.Printf("SSL enabled.\n")
-	http.ListenAndServeTLS(fmt.Sprintf(":%s", config.Port), "cert.pem", "key.pem", nil)
+	http.ListenAndServeTLS(fmt.Sprintf("%s:%s", config.IP, config.Port), "cert.pem", "key.pem", nil)
 }
 
 func isHttps() bool {
