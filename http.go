@@ -17,12 +17,18 @@ func HttpServer() {
 	http.HandleFunc("/favicon.ico", http.NotFound)
 	http.HandleFunc("/", AuthHandler(Handler))
 	fmt.Printf("goforever serving port %s\n", config.Port)
+	fmt.Printf("goforever serving IP %s\n", config.IP)
+	bindAddress := fmt.Sprintf("%s:%s", config.IP, config.Port)
 	if isHttps() == false {
-		http.ListenAndServe(fmt.Sprintf(":%s", config.Port), nil)
+		if err := http.ListenAndServe(bindAddress, nil); err != nil {
+			log.Fatal("ListenAndServe: ", err)
+		}
 		return
 	}
 	log.Printf("SSL enabled.\n")
-	http.ListenAndServeTLS(fmt.Sprintf(":%s", config.Port), "cert.pem", "key.pem", nil)
+	if err := http.ListenAndServeTLS(bindAddress, "cert.pem", "key.pem", nil); err != nil {
+		log.Fatal("ListenAndServeTLS: ", err)
+	}
 }
 
 func isHttps() bool {

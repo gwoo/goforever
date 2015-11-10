@@ -133,6 +133,9 @@ func setConfig() {
 	if config.Port == "" {
 		config.Port = "2224"
 	}
+	if config.IP == "" {
+		config.IP = "0.0.0.0"
+	}
 }
 
 func host() string {

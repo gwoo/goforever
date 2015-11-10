@@ -11,6 +11,7 @@ import (
 )
 
 type Config struct {
+	IP        string
 	Port      string
 	Username  string
 	Password  string
