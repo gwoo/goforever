@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/gwoo/greq"
 )
@@ -37,7 +38,7 @@ func init() {
 	daemon = &Process{
 		Name:    "goforever",
 		Args:    []string{},
-		Command: "goforever",
+		Command: filepath.Base(os.Args[0]),
 		Pidfile: config.Pidfile,
 		Logfile: config.Logfile,
 		Errfile: config.Errfile,
